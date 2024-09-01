@@ -713,14 +713,20 @@ class AVNRouter(AVNDirectoryHandlerBase):
           self.setInfo("autopilot","RMB=%s,APB=%s:WpNr=%d,XTE=%s%s,DST=%s,BRG=%s,ARR=%s,VMG=%skn"%
                       (computeRMB,computeAPB,self.WpNr,XTE,LR,destDis,destBearing,arrival,kn),WorkerStatus.NMEA)
           hasRMB=True
+          if 'name' in self.startWp:
+            nx5 = self.startWp['name']
+            if nx5 == None:
+              nx5 = 'Start WP'
+          else:
+            nx5 = 'Start WP'
           if computeRMB:
             nmeaData = "GPRMB,A,%.2f,%s,%s,%s,%s,%s,%s,%s,%.1f,%.1f,%.1f,%s,A"% (
-              XTE,LR,self.WpNr,self.WpNr+1,wplat[0],wplat[1],wplon[0],wplon[1],destDis,destBearing,kn,arrival)
+              XTE,LR,nx5,self.endWp['name'],wplat[0],wplat[1],wplon[0],wplon[1],destDis,destBearing,kn,arrival)
             nmeaData = "$" + nmeaData + "*" + NMEAParser.nmeaChecksum(nmeaData) + "\r\n"
             AVNLog.debug("adding NMEA %s",nmeaData)
             self.queue.addNMEA(nmeaData,source="router")
           if computeAPB:
-            nmeaData = "GPAPB,A,A,%.2f,%s,N,%s,,%.1f,T,%s,%.1f,T,%.1f,T" % (XTE,LR,arrival,brg,self.WpNr + 1,destBearing,destBearing)
+            nmeaData = "GPAPB,A,A,%.2f,%s,N,%s,,%.1f,T,%s,%.1f,T,%.1f,T" % (XTE,LR,arrival,brg,self.endWp['name'],destBearing,destBearing)
             nmeaData = "$" + nmeaData + "*" + NMEAParser.nmeaChecksum(nmeaData) + "\r\n"
             AVNLog.debug("adding NMEA %s", nmeaData, )
             self.queue.addNMEA(nmeaData,source="router")
